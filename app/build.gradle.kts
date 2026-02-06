@@ -39,20 +39,16 @@ android {
 }
 
 dependencies {
-    implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation("androidx.compose.ui:ui:1.7.0")
-    implementation("androidx.compose.material3:material3:1.3.0")
+    implementation(libs.androidx.connect.client)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.material3)
 
-    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation(libs.androidx.ui.tooling.preview)
 
-    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation(libs.androidx.ui.tooling)
 
-
-//    implementation(libs.androidx.core.ktx)
-//    implementation(libs.androidx.appcompat)
-//    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

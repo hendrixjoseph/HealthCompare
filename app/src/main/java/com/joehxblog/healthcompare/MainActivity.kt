@@ -66,12 +66,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HealthDashboard(client: HealthConnectClient) {
-    var todaySteps by remember { mutableStateOf(0L) }
-    var yesterdaySteps by remember { mutableStateOf(0L) }
-    var todayCalories by remember { mutableStateOf(0.0) }
-    var yesterdayCalories by remember { mutableStateOf(0.0) }
-    var weeklyAvgSteps by remember { mutableStateOf(0L) }
-    var weeklyAvgCalories by remember { mutableStateOf(0.0) }
+    var todaySteps by remember { mutableLongStateOf(0L) }
+    var yesterdaySteps by remember { mutableLongStateOf(0L) }
+    var todayCalories by remember { mutableDoubleStateOf(0.0) }
+    var yesterdayCalories by remember { mutableDoubleStateOf(0.0) }
+    var weeklyAvgSteps by remember { mutableLongStateOf(0L) }
+    var weeklyAvgCalories by remember { mutableDoubleStateOf(0.0) }
 
 
     LaunchedEffect(Unit) {
@@ -101,7 +101,7 @@ fun HealthDashboard(client: HealthConnectClient) {
         Text("Steps yesterday (same time): $yesterdaySteps")
         Text("Calories today: ${"%.0f".format(todayCalories)}")
         Text("Calories yesterday (same time): ${"%.0f".format(yesterdayCalories)}")
-        Divider()
+        HorizontalDivider()
         Text("7-Day Averages", style = MaterialTheme.typography.headlineSmall)
         Text("Avg steps/day: $weeklyAvgSteps")
         Text("Avg calories/day: ${"%.0f".format(weeklyAvgCalories)}")
