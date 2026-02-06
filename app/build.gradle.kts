@@ -45,6 +45,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.material3)
 
+    implementation("com.patrykandpatrick.vico:compose:1.15.0")
+
     implementation(libs.androidx.ui.tooling.preview)
 
     debugImplementation(libs.androidx.ui.tooling)
