@@ -3,13 +3,19 @@ package com.joehxblog.healthcompare
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import java.time.LocalDate
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 class HealthFunctionsProvider : PreviewParameterProvider<HealthFunctions> {
     override val values = listOf(MockHealthFunctions()).asSequence()
 }
 
-class ChartDataProvider : PreviewParameterProvider<List<Pair<LocalDateTime, Double>>> {
-    override val values = listOf(MockHealthFunctions()._getHourlyCaloriesToday()).asSequence()
+class ChartDataProvider : PreviewParameterProvider<ChartData> {
+    override val values = listOf(
+        ChartData(
+        MockHealthFunctions().getHourlyCaloriesToday(),
+        MockHealthFunctions().getHourlyCaloriesYesterday(),
+
+        )).asSequence()
 }
 
 class MockHealthFunctions: HealthFunctions {
@@ -27,14 +33,20 @@ class MockHealthFunctions: HealthFunctions {
         return 1200.0
     }
 
-    override suspend fun getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
-        return _getHourlyCaloriesToday()
+    override suspend fun getHourlyCalories(date: LocalDate): List<Pair<LocalDateTime, Double>> {
+        return getHourlyCaloriesToday()
     }
 
-    fun _getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
-        val startOfDay = LocalDate.of(2026, 2, 25).atStartOfDay()
+    fun getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
+        return _getHourlyCalories(13)
+    }
 
-        val hoursSoFar = 13L
+    fun getHourlyCaloriesYesterday(): List<Pair<LocalDateTime, Double>> {
+        return _getHourlyCalories(24)
+    }
+
+    fun _getHourlyCalories(hoursSoFar: Long): List<Pair<LocalDateTime, Double>> {
+        val startOfDay = LocalDate.now().atStartOfDay()
 
         val results = mutableListOf<Pair<LocalDateTime, Double>>()
 
@@ -44,13 +56,15 @@ class MockHealthFunctions: HealthFunctions {
 
             val time = startOfDay.plusHours(hour)
 
+            val wiggle = Random(1).nextInt(20)
+
             // Simulate realistic calorie burn pattern
             val hourlyBurn = when (hour) {
-                in 0..5 -> 40.0     // sleeping/resting
-                in 6..8 -> 80.0     // morning activity
-                in 9..16 -> 120.0   // active daytime
-                in 17..19 -> 150.0  // workout/evening activity
-                else -> 90.0        // wind down
+                in 0..5 -> 40.0 + wiggle     // sleeping/resting
+                in 6..8 -> 80.0 + wiggle     // morning activity
+                in 9..16 -> 120.0 + wiggle   // active daytime
+                in 17..19 -> 150.0 + wiggle // workout/evening activity
+                else -> 90.0 + wiggle       // wind down
             }
 
             runningTotal += hourlyBurn

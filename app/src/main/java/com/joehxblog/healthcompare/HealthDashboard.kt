@@ -37,7 +37,7 @@ fun HealthDashboard(
     var weeklyAvgSteps by remember { mutableLongStateOf(0L) }
     var weeklyAvgCalories by remember { mutableDoubleStateOf(0.0) }
 
-    var chartData by remember { mutableStateOf<List<Pair<LocalDateTime, Double>>>(emptyList()) }
+    var chartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
 
 
     LaunchedEffect(Unit) {
@@ -46,20 +46,20 @@ fun HealthDashboard(
         val startOfToday = LocalDate.now().atStartOfDay()
         val startOfYesterday = startOfToday.minusDays(1)
 
-
         todaySteps = healthFunctions.aggregateSteps(startOfToday, now)
         yesterdaySteps = healthFunctions.aggregateSteps(startOfYesterday, startOfYesterday.plusHours(now.hour.toLong()))
 
-
         todayCalories = healthFunctions.aggregateCalories(startOfToday, now)
         yesterdayCalories = healthFunctions.aggregateCalories(startOfYesterday, startOfYesterday.plusHours(now.hour.toLong()))
-
 
         val weekStart = startOfToday.minusDays(7)
         weeklyAvgSteps = healthFunctions.aggregateSteps(weekStart, startOfToday) / 7
         weeklyAvgCalories = healthFunctions.aggregateCalories(weekStart, startOfToday) / 7.0
 
-        chartData = healthFunctions.getHourlyCaloriesToday()
+        val today = healthFunctions.getHourlyCalories(LocalDate.now())
+        val yesterday = healthFunctions.getHourlyCalories(LocalDate.now().minusDays(1))
+
+        chartData = ChartData(today, yesterday)
     }
 
     Column(

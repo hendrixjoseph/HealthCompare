@@ -38,14 +38,14 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
         return response[TotalCaloriesBurnedRecord.ENERGY_TOTAL]?.inKilocalories ?: 0.0
     }
 
-    override suspend fun getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
-        val now = LocalDateTime.now()
-        val startOfDay = LocalDate.now().atStartOfDay()
+    override suspend fun getHourlyCalories(date: LocalDate): List<Pair<LocalDateTime, Double>> {
+        val startOfDay = date.atStartOfDay()
+        val endOfDay = minOf(date.plusDays(1).atStartOfDay(), LocalDateTime.now())
 
         val response = client.readRecords(
             ReadRecordsRequest(
                 recordType = TotalCaloriesBurnedRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startOfDay, now)
+                timeRangeFilter = TimeRangeFilter.between(startOfDay, endOfDay)
             )
         )
 
@@ -57,7 +57,6 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
                 .truncatedTo(ChronoUnit.HOURS)
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime()
-
 
             val calories = record.energy.inKilocalories
             hourlyBuckets[hour] = (hourlyBuckets[hour] ?: 0.0) + calories
