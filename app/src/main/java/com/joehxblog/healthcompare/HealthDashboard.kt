@@ -1,6 +1,11 @@
 package com.joehxblog.healthcompare
 
+import android.graphics.Color
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,19 +17,19 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
-import androidx.health.connect.client.request.AggregateRequest
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
+@Preview(showBackground = false, showSystemUi = false, backgroundColor = 0xFF3F51B5)
 @Composable
-fun HealthDashboard(healthFunctions: HealthFunctions) {
+fun HealthDashboard(
+    @PreviewParameter(HealthFunctionsProvider::class)
+    healthFunctions: HealthFunctions
+) {
     var todaySteps by remember { mutableLongStateOf(0L) }
     var yesterdaySteps by remember { mutableLongStateOf(0L) }
     var todayCalories by remember { mutableDoubleStateOf(0.0) }
@@ -57,14 +62,12 @@ fun HealthDashboard(healthFunctions: HealthFunctions) {
         chartData = healthFunctions.getHourlyCaloriesToday()
     }
 
-    var i = 0;
-
-    Column {
-        Text((i++).toString())
-        Text((i++).toString())
-        Text((i++).toString())
-        Text((i++).toString())
-        Text((i++).toString())
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
         Text("Today vs Yesterday", style = MaterialTheme.typography.headlineSmall)
         Text("Steps today: $todaySteps")
         Text("Steps yesterday (same time): $yesterdaySteps")

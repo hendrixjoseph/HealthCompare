@@ -1,7 +1,16 @@
 package com.joehxblog.healthcompare
 
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import java.time.LocalDate
 import java.time.LocalDateTime
+
+class HealthFunctionsProvider : PreviewParameterProvider<HealthFunctions> {
+    override val values = listOf(MockHealthFunctions()).asSequence()
+}
+
+class ChartDataProvider : PreviewParameterProvider<List<Pair<LocalDateTime, Double>>> {
+    override val values = listOf(MockHealthFunctions()._getHourlyCaloriesToday()).asSequence()
+}
 
 class MockHealthFunctions: HealthFunctions {
     override suspend fun aggregateSteps(
@@ -19,10 +28,13 @@ class MockHealthFunctions: HealthFunctions {
     }
 
     override suspend fun getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
-        val now = LocalDateTime.now()
-        val startOfDay = LocalDate.now().atStartOfDay()
+        return _getHourlyCaloriesToday()
+    }
 
-        val hoursSoFar = now.hour.coerceAtLeast(1)
+    fun _getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
+        val startOfDay = LocalDate.of(2026, 2, 25).atStartOfDay()
+
+        val hoursSoFar = 13L
 
         val results = mutableListOf<Pair<LocalDateTime, Double>>()
 
@@ -30,7 +42,7 @@ class MockHealthFunctions: HealthFunctions {
 
         for (hour in 0..hoursSoFar) {
 
-            val time = startOfDay.plusHours(hour.toLong())
+            val time = startOfDay.plusHours(hour)
 
             // Simulate realistic calorie burn pattern
             val hourlyBurn = when (hour) {
@@ -48,4 +60,6 @@ class MockHealthFunctions: HealthFunctions {
 
         return results
     }
+
+
 }
