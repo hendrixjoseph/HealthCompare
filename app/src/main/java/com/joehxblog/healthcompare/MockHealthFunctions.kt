@@ -56,7 +56,7 @@ class MockHealthFunctions: HealthFunctions {
 
             val time = startOfDay.plusHours(hour)
 
-            val wiggle = Random(1).nextInt(20)
+            val wiggle = Random(1).nextInt(60) - 30
 
             // Simulate realistic calorie burn pattern
             val hourlyBurn = when (hour) {
