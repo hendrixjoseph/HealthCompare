@@ -1,6 +1,7 @@
 [versions]
 activityCompose = "1.12.3"
 agp = "9.0.0"
+vico = "2.4.3"
 connectClient = "1.1.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -18,6 +19,7 @@ androidx-material3 = { module = "androidx.compose.material3:material3", version.
 androidx-ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

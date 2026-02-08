@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
             setContent {
                 MaterialTheme {
                     Surface {
-                        HealthDashboard(MockHealthFunctions())
+                        HealthDashboard(RealHealthFunctions(healthClient))
                     }
                 }
             }

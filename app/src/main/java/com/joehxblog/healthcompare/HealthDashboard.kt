@@ -1,6 +1,7 @@
 package com.joehxblog.healthcompare
 
 import android.graphics.Color
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
