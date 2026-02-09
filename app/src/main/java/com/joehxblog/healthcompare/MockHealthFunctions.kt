@@ -36,29 +36,26 @@ class MockHealthFunctions: HealthFunctions {
         return 1200.0
     }
 
-    override suspend fun getHourlyCalories(date: LocalDate): List<Pair<LocalDateTime, Double>> {
+    override suspend fun getHourlyCalories(date: LocalDate): List<Double> {
         return getHourlyCaloriesToday()
     }
 
-    fun getHourlyCaloriesToday(): List<Pair<LocalDateTime, Double>> {
+    fun getHourlyCaloriesToday(): List<Double> {
         return _getHourlyCalories(13)
     }
 
-    fun getHourlyCaloriesYesterday(): List<Pair<LocalDateTime, Double>> {
+    fun getHourlyCaloriesYesterday(): List<Double> {
         return _getHourlyCalories(24)
     }
 
-    fun _getHourlyCalories(hoursSoFar: Long): List<Pair<LocalDateTime, Double>> {
+    fun _getHourlyCalories(hoursSoFar: Long): List<Double> {
         val startOfDay = LocalDate.now().atStartOfDay()
 
-        val results = mutableListOf<Pair<LocalDateTime, Double>>()
+        val results = mutableListOf<Double>()
 
         var runningTotal = 0.0
 
         for (hour in 0..hoursSoFar) {
-
-            val time = startOfDay.plusHours(hour)
-
             val wiggle = random.nextInt(60) - 30
 
             // Simulate realistic calorie burn pattern
@@ -72,7 +69,7 @@ class MockHealthFunctions: HealthFunctions {
 
             runningTotal += hourlyBurn
 
-            results.add(time to runningTotal)
+            results.add(runningTotal)
         }
 
         return results

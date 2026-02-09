@@ -39,7 +39,7 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
         return response[what]
     }
 
-    override suspend fun getHourlyCalories(date: LocalDate): List<Pair<LocalDateTime, Double>> {
+    override suspend fun getHourlyCalories(date: LocalDate): List<Double> {
         val startOfDay = date.atStartOfDay()
         val endOfDay = minOf(date.plusDays(1).atStartOfDay(), LocalDateTime.now())
 
@@ -47,14 +47,14 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
 
         var runningTotal = 0.0
 
-        val list = ArrayList<Pair<LocalDateTime, Double>>()
+        val list = mutableListOf<Double>()
 
-        list.add(Pair(startOfDay, 0.0));
+        list.add(0.0);
 
         for (hour in 1..hours) {
             val currentTime = startOfDay.plusHours(hour.toLong())
             runningTotal += aggregateCalories(currentTime.minusHours(1), currentTime)
-            list.add(Pair(currentTime, runningTotal))
+            list.add(runningTotal)
         }
 
         Log.d("hourly calories", list.toString())

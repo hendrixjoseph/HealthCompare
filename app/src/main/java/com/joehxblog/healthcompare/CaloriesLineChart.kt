@@ -21,20 +21,13 @@ import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import java.time.LocalDateTime
 
 data class ChartData(
-    val todayData: List<Pair<LocalDateTime, Double>>,
-    val yesterdayData: List<Pair<LocalDateTime, Double>>,
+    val todayData: List<Double>,
+    val yesterdayData: List<Double>,
 ) {
     fun isEmpty(): Boolean {
         return todayData.isEmpty() && yesterdayData.isEmpty()
-    }
-
-    private fun mapData(data: List<Pair<LocalDateTime, Double>>): Array<Pair<Float, Float>> {
-        return data.mapIndexed { index, pair ->
-            index.toFloat() to pair.second.toFloat()
-        }.toTypedArray()
     }
 }
 
@@ -52,8 +45,8 @@ fun CaloriesLineChart(
     LaunchedEffect(data) {
         modelProducer.runTransaction {
             lineSeries {
-                series(data.yesterdayData.map { it.second })
-                series(data.todayData.map { it.second })
+                series(data.yesterdayData)
+                series(data.todayData)
             }
         }
     }
