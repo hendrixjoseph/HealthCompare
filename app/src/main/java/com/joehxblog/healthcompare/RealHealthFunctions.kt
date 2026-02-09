@@ -1,6 +1,5 @@
 package com.joehxblog.healthcompare
 
-import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.aggregate.AggregateMetric
 import androidx.health.connect.client.records.StepsRecord
@@ -40,6 +39,14 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
     }
 
     override suspend fun getHourlyCalories(date: LocalDate): List<Double> {
+        return getHourly(date, this::aggregateCalories)
+    }
+
+    override suspend fun getHourlySteps(date: LocalDate): List<Double> {
+        return getHourly(date, this::aggregateSteps)
+    }
+
+    suspend fun getHourly(date: LocalDate, aggregate: suspend (LocalDateTime, LocalDateTime) -> Number): List<Double> {
         val startOfDay = date.atStartOfDay()
         val endOfDay = minOf(date.plusDays(1).atStartOfDay(), LocalDateTime.now())
 
@@ -53,11 +60,9 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
 
         for (hour in 1..hours) {
             val currentTime = startOfDay.plusHours(hour.toLong())
-            runningTotal += aggregateCalories(currentTime.minusHours(1), currentTime)
+            runningTotal += aggregate(currentTime.minusHours(1), currentTime).toDouble()
             list.add(runningTotal)
         }
-
-        Log.d("hourly calories", list.toString())
 
         return list
     }

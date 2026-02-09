@@ -2,10 +2,11 @@ package com.joehxblog.healthcompare
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
@@ -15,7 +16,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,9 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.joehxblog.healthcompare.chart.ChartData
+import com.joehxblog.healthcompare.chart.LineChart
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Preview(showBackground = true, showSystemUi = false, backgroundColor = 0xFFFFFF)
@@ -44,7 +45,8 @@ fun HealthDashboard(
     var weeklyAvgSteps by remember { mutableLongStateOf(0L) }
     var weeklyAvgCalories by remember { mutableLongStateOf(0L) }
 
-    var chartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
+    var calorieChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
+    var stepChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
 
     var isRefreshing by remember { mutableStateOf(false) }
 
@@ -54,7 +56,7 @@ fun HealthDashboard(
 
     suspend fun refresh() {
         now = LocalDateTime.now()
-        val startOfToday = LocalDate.now().atStartOfDay()
+        val startOfToday = now.toLocalDate().atStartOfDay()
         val startOfYesterday = startOfToday.minusDays(1)
 
         todaySteps = healthFunctions.aggregateSteps(startOfToday, now)
@@ -67,10 +69,18 @@ fun HealthDashboard(
         weeklyAvgSteps = healthFunctions.aggregateSteps(weekStart, startOfToday) / 7
         weeklyAvgCalories = healthFunctions.aggregateCalories(weekStart, startOfToday).toLong() / 7
 
-        val today = healthFunctions.getHourlyCalories(LocalDate.now())
-        val yesterday = healthFunctions.getHourlyCalories(LocalDate.now().minusDays(1))
+        val today = now.toLocalDate()
+        val yesterday = today.minusDays(1)
 
-        chartData = ChartData(today, yesterday)
+        calorieChartData = ChartData(
+            healthFunctions.getHourlyCalories(today),
+            healthFunctions.getHourlyCalories(yesterday)
+        )
+
+        stepChartData = ChartData(
+            healthFunctions.getHourlySteps(today),
+            healthFunctions.getHourlySteps(yesterday)
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -78,8 +88,6 @@ fun HealthDashboard(
     }
 
     val scrollState = rememberScrollState()
-
-    val nf = NumberFormat.getNumberInstance()
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
@@ -96,6 +104,7 @@ fun HealthDashboard(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .padding(16.dp)
+                .statusBarsPadding()
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(
                 space = 12.dp,
@@ -103,17 +112,52 @@ fun HealthDashboard(
             )
         ) {
             Text("Last Updated: $now")
-            Text("Today vs Yesterday", style = MaterialTheme.typography.headlineSmall)
-            Text("Steps today: ${nf.format(todaySteps)}")
-            Text("Steps yesterday (same time): ${nf.format(yesterdaySteps)}")
-            Text("Calories today: ${nf.format(todayCalories)}")
-            Text("Calories yesterday (same time): ${nf.format(yesterdayCalories)}")
             HorizontalDivider()
-            Text("7-Day Averages", style = MaterialTheme.typography.headlineSmall)
-            Text("Avg steps/day: ${nf.format(weeklyAvgSteps)}")
-            Text("Avg calories/day: ${nf.format(weeklyAvgCalories)}")
+            HealthChart(
+                "Calories Burned",
+                "kCal",
+                todayCalories,
+                yesterdayCalories,
+                weeklyAvgCalories,
+                calorieChartData
+            )
             HorizontalDivider()
-            CaloriesLineChart(data = chartData)
+            HealthChart(
+                "Steps Taken",
+                "Steps",
+                todaySteps,
+                yesterdaySteps,
+                weeklyAvgSteps,
+                stepChartData
+            )
         }
     }
+}
+
+@Composable
+fun HealthChart(
+    title: String,
+    yAxisLabel: String,
+    today: Number,
+    yesterday: Number,
+    weekly: Number,
+    chartData: ChartData
+) {
+    val nf = NumberFormat.getNumberInstance()
+
+    Text(title, style = MaterialTheme.typography.headlineSmall)
+    Row {
+        Text("Today", Modifier.weight(1.0F))
+        Text("Yesterday", Modifier.weight(1.0F))
+        Text("Weekly", Modifier.weight(1.0F))
+    }
+    Row {
+        Text(nf.format(today), Modifier.weight(1.0F))
+        Text(nf.format(yesterday), Modifier.weight(1.0F))
+        Text(nf.format(weekly), Modifier.weight(1.0F))
+    }
+    LineChart(
+        data = chartData,
+        yAxisLabel = yAxisLabel
+    )
 }

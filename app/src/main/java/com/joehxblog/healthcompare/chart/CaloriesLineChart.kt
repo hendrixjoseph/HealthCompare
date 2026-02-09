@@ -1,4 +1,4 @@
-package com.joehxblog.healthcompare
+package com.joehxblog.healthcompare.chart
 
 
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import com.joehxblog.healthcompare.ChartDataProvider
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
@@ -22,20 +22,12 @@ import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 
-data class ChartData(
-    val todayData: List<Double>,
-    val yesterdayData: List<Double>,
-) {
-    fun isEmpty(): Boolean {
-        return todayData.isEmpty() && yesterdayData.isEmpty()
-    }
-}
-
 @Preview
 @Composable
-fun CaloriesLineChart(
+fun LineChart(
     @PreviewParameter(ChartDataProvider::class)
     data: ChartData,
+    yAxisLabel: String = "kCal",
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) return
@@ -58,7 +50,7 @@ fun CaloriesLineChart(
                 label = rememberTextComponent(),
                 valueFormatter = {_, value, _ -> "${value.toInt()}"},
                 titleComponent = rememberTextComponent(),
-                title = "kCal"
+                title = yAxisLabel
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
                 label = rememberTextComponent(),

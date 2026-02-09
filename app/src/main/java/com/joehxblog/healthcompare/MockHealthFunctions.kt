@@ -1,6 +1,7 @@
 package com.joehxblog.healthcompare
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.joehxblog.healthcompare.chart.ChartData
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -12,10 +13,11 @@ class HealthFunctionsProvider : PreviewParameterProvider<HealthFunctions> {
 class ChartDataProvider : PreviewParameterProvider<ChartData> {
     override val values = listOf(
         ChartData(
-        MockHealthFunctions().getHourlyCaloriesToday(),
-        MockHealthFunctions().getHourlyCaloriesYesterday(),
+            MockHealthFunctions().getHourlyCaloriesToday(),
+            MockHealthFunctions().getHourlyCaloriesYesterday(),
 
-        )).asSequence()
+            )
+    ).asSequence()
 }
 
 class MockHealthFunctions: HealthFunctions {
@@ -40,6 +42,10 @@ class MockHealthFunctions: HealthFunctions {
         return getHourlyCaloriesToday()
     }
 
+    override suspend fun getHourlySteps(date: LocalDate): List<Double> {
+        return _getHourlySteps(24)
+    }
+
     fun getHourlyCaloriesToday(): List<Double> {
         return _getHourlyCalories(13)
     }
@@ -48,9 +54,32 @@ class MockHealthFunctions: HealthFunctions {
         return _getHourlyCalories(24)
     }
 
-    fun _getHourlyCalories(hoursSoFar: Long): List<Double> {
-        val startOfDay = LocalDate.now().atStartOfDay()
+    fun _getHourlySteps(hoursSoFar: Long): List<Double> {
+        val results = mutableListOf<Double>()
 
+        var runningTotal = 0.0
+
+        for (hour in 0..hoursSoFar) {
+            val wiggle = random.nextInt(60) - 30
+
+            // Simulate realistic calorie burn pattern
+            val hourlyBurn = when (hour) {
+                in 0..5 -> 0     // sleeping/resting
+                in 6..8 -> 80 + wiggle     // morning activity
+                in 9..16 -> 120 + wiggle   // active daytime
+                in 17..19 -> 150 + wiggle // workout/evening activity
+                else -> 0       // wind down
+            }
+
+            runningTotal += hourlyBurn
+
+            results.add(runningTotal)
+        }
+
+        return results
+    }
+
+    fun _getHourlyCalories(hoursSoFar: Long): List<Double> {
         val results = mutableListOf<Double>()
 
         var runningTotal = 0.0
@@ -74,6 +103,4 @@ class MockHealthFunctions: HealthFunctions {
 
         return results
     }
-
-
 }
