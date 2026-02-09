@@ -6,12 +6,9 @@ import androidx.health.connect.client.aggregate.AggregateMetric
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.request.AggregateRequest
-import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 
 class RealHealthFunctions(private val client: HealthConnectClient): HealthFunctions {
     override suspend fun aggregateSteps(
@@ -50,7 +47,7 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
 
         var runningTotal = 0.0
 
-        var list = ArrayList<Pair<LocalDateTime, Double>>()
+        val list = ArrayList<Pair<LocalDateTime, Double>>()
 
         list.add(Pair(startOfDay, 0.0));
 
@@ -63,35 +60,5 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
         Log.d("hourly calories", list.toString())
 
         return list
-//
-//        val response = client.readRecords(
-//            ReadRecordsRequest(
-//                recordType = TotalCaloriesBurnedRecord::class,
-//                timeRangeFilter = TimeRangeFilter.between(startOfDay, endOfDay)
-//            )
-//        )
-//
-//        // Create hourly buckets
-//        val hourlyBuckets = mutableMapOf<LocalDateTime, Double>()
-//
-//        response.records.forEach { record ->
-//            val hour = record.startTime
-//                .truncatedTo(ChronoUnit.HOURS)
-//                .atZone(ZoneId.systemDefault())
-//                .toLocalDateTime()
-//
-//            val calories = record.energy.inKilocalories
-//            hourlyBuckets[hour] = (hourlyBuckets[hour] ?: 0.0) + calories
-//        }
-//
-//        // Sort by time
-//        val sorted = hourlyBuckets.toSortedMap()
-//
-//        // Convert to cumulative (increasing) list
-////        var runningTotal = 0.0
-//        return sorted.map { (time, value) ->
-//            runningTotal += value
-//            time to runningTotal
-//        }
     }
 }

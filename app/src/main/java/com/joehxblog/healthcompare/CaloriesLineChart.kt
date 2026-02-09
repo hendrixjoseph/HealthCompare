@@ -52,8 +52,8 @@ fun CaloriesLineChart(
     LaunchedEffect(data) {
         modelProducer.runTransaction {
             lineSeries {
-                series(data.todayData.map { it.second })
                 series(data.yesterdayData.map { it.second })
+                series(data.todayData.map { it.second })
             }
         }
     }
@@ -73,7 +73,8 @@ fun CaloriesLineChart(
                     val hour = value.toInt()
                     when {
                         hour == 0 -> "12a"
-                        hour < 13 -> "${value.toInt()}a"
+                        hour < 12 -> "${value.toInt()}a"
+                        hour == 12 -> "12p"
                         else -> "${value.toInt() - 12}p"
                     }
                  },
