@@ -2,9 +2,11 @@ package com.joehxblog.healthcompare
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.joehxblog.healthcompare.chart.ChartData
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.random.Random
+
 
 class HealthFunctionsProvider : PreviewParameterProvider<HealthFunctions> {
     override val values = listOf(MockHealthFunctions()).asSequence()
@@ -28,14 +30,16 @@ class MockHealthFunctions: HealthFunctions {
         start: LocalDateTime,
         end: LocalDateTime
     ): Long {
-        return 5321
+        val minutes = Duration.between(start, end).toMinutes()
+        return 5321 * minutes / 1440
     }
 
     override suspend fun aggregateCalories(
         start: LocalDateTime,
         end: LocalDateTime
     ): Double {
-        return 1200.0
+        val minutes = Duration.between(start, end).toMinutes()
+        return 2010.5 * minutes / 1440.0
     }
 
     override suspend fun getHourlyCalories(date: LocalDate): List<Double> {

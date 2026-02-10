@@ -58,12 +58,13 @@ fun HealthDashboard(
         now = LocalDateTime.now()
         val startOfToday = now.toLocalDate().atStartOfDay()
         val startOfYesterday = startOfToday.minusDays(1)
+        val sameTimeYesterday = now.minusDays(1)
 
         todaySteps = healthFunctions.aggregateSteps(startOfToday, now)
-        yesterdaySteps = healthFunctions.aggregateSteps(startOfYesterday, startOfYesterday.plusHours(now.hour.toLong()))
+        yesterdaySteps = healthFunctions.aggregateSteps(startOfYesterday, sameTimeYesterday)
 
         todayCalories = healthFunctions.aggregateCalories(startOfToday, now).toLong()
-        yesterdayCalories = healthFunctions.aggregateCalories(startOfYesterday, startOfYesterday.plusHours(now.hour.toLong())).toLong()
+        yesterdayCalories = healthFunctions.aggregateCalories(startOfYesterday, sameTimeYesterday).toLong()
 
         val weekStart = startOfToday.minusDays(7)
         weeklyAvgSteps = healthFunctions.aggregateSteps(weekStart, startOfToday) / 7
