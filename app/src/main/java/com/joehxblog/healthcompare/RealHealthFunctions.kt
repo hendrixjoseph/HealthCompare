@@ -6,6 +6,7 @@ import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.time.TimeRangeFilter
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -50,7 +51,7 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
         val startOfDay = date.atStartOfDay()
         val endOfDay = minOf(date.plusDays(1).atStartOfDay(), LocalDateTime.now())
 
-        val hours = if (endOfDay.hour == 0) 24 else endOfDay.hour
+        val quarterHours = Duration.between(startOfDay, endOfDay).toMinutes() / 15
 
         var runningTotal = 0.0
 
@@ -58,9 +59,9 @@ class RealHealthFunctions(private val client: HealthConnectClient): HealthFuncti
 
         list.add(0.0);
 
-        for (hour in 1..hours) {
-            val currentTime = startOfDay.plusHours(hour.toLong())
-            runningTotal += aggregate(currentTime.minusHours(1), currentTime).toDouble()
+        for (quarter in 1..quarterHours) {
+            val currentTime = startOfDay.plusMinutes(15 * quarter)
+            runningTotal += aggregate(currentTime.minusMinutes(15), currentTime).toDouble()
             list.add(runningTotal)
         }
 

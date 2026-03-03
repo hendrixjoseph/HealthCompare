@@ -16,7 +16,9 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -37,14 +39,20 @@ fun LineChart(
     LaunchedEffect(data) {
         modelProducer.runTransaction {
             lineSeries {
-                series(data.yesterdayData)
-                series(data.todayData)
+                series(
+                    data.yesterdayData.indices.map{ i -> i / 4.0},
+                    data.yesterdayData
+                )
+                series(
+                    data.todayData.indices.map{ i -> i / 4.0},
+                    data.todayData
+                )
             }
         }
     }
 
     CartesianChartHost(
-        rememberCartesianChart(
+        chart = rememberCartesianChart(
                 rememberLineCartesianLayer(),
             startAxis = VerticalAxis.rememberStart(
                 label = rememberTextComponent(),
@@ -54,21 +62,28 @@ fun LineChart(
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
                 label = rememberTextComponent(),
+                itemPlacer = HorizontalAxis.ItemPlacer.aligned(
+                    spacing = { 4 },
+                    offset = { 0 }
+                ),
                 valueFormatter = {_, value, _ ->
                     val hour = value.toInt()
                     when {
                         hour == 0 -> "12a"
-                        hour < 12 -> "${value.toInt()}a"
+                        hour < 12 -> "${hour}a"
                         hour == 12 -> "12p"
-                        else -> "${value.toInt() - 12}p"
+                        else -> "${hour - 12}p"
                     }
                  },
                 titleComponent = rememberTextComponent(),
                 title = "Time of Day"
             ),
         ),
-        modelProducer,
-        modifier
+        zoomState = rememberVicoZoomState(
+            initialZoom = remember { Zoom.fixed(0.25f) }
+        ),
+        modelProducer =  modelProducer,
+        modifier = modifier
             .fillMaxWidth()
             .height(300.dp)
     )

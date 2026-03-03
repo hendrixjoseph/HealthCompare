@@ -63,11 +63,11 @@ class MockHealthFunctions: HealthFunctions {
 
         var runningTotal = 0.0
 
-        for (hour in 0..hoursSoFar) {
+        for (quarter in 0..hoursSoFar * 4) {
             val wiggle = random.nextInt(60) - 30
 
             // Simulate realistic calorie burn pattern
-            val hourlyBurn = when (hour) {
+            val hourlyBurn = when (quarter / 4) {
                 in 0..5 -> 0     // sleeping/resting
                 in 6..8 -> 80 + wiggle     // morning activity
                 in 9..16 -> 120 + wiggle   // active daytime
@@ -75,7 +75,7 @@ class MockHealthFunctions: HealthFunctions {
                 else -> 0       // wind down
             }
 
-            runningTotal += hourlyBurn
+            runningTotal += (hourlyBurn / 4)
 
             results.add(runningTotal)
         }
@@ -88,11 +88,11 @@ class MockHealthFunctions: HealthFunctions {
 
         var runningTotal = 0.0
 
-        for (hour in 0..hoursSoFar) {
+        for (quarter in 0..hoursSoFar * 4) {
             val wiggle = random.nextInt(60) - 30
 
             // Simulate realistic calorie burn pattern
-            val hourlyBurn = when (hour) {
+            val hourlyBurn = when (quarter / 4) {
                 in 0..5 -> 40.0 + wiggle     // sleeping/resting
                 in 6..8 -> 80.0 + wiggle     // morning activity
                 in 9..16 -> 120.0 + wiggle   // active daytime
@@ -100,7 +100,7 @@ class MockHealthFunctions: HealthFunctions {
                 else -> 90.0 + wiggle       // wind down
             }
 
-            runningTotal += hourlyBurn
+            runningTotal += (hourlyBurn / 4)
 
             results.add(runningTotal)
         }
