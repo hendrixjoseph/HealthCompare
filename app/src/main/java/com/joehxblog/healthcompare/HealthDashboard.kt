@@ -35,6 +35,9 @@ import com.joehxblog.healthcompare.chart.LineChart
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.util.Locale
 
 @Preview(showBackground = true, showSystemUi = false, backgroundColor = 0xFFFFFF)
 @Composable
@@ -55,6 +58,11 @@ fun HealthDashboard(
     var isRefreshing by remember { mutableStateOf(true) }
 
     var now by remember { mutableStateOf(LocalDateTime.now()) }
+
+    val formatter = DateTimeFormatter
+        .ofLocalizedDateTime(FormatStyle.MEDIUM)
+        .withLocale(Locale.getDefault())
+
 
     val scope = rememberCoroutineScope()
 
@@ -118,10 +126,9 @@ fun HealthDashboard(
                 alignment = Alignment.CenterVertically
             )
         ) {
-            Text("Last Updated: $now")
+            Text("Last Updated: ${now.format(formatter)}")
 
             if (isRefreshing) {
-
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
