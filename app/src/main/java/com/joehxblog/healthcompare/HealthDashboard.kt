@@ -1,15 +1,18 @@
 package com.joehxblog.healthcompare
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -49,13 +52,15 @@ fun HealthDashboard(
     var calorieChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
     var stepChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
 
-    var isRefreshing by remember { mutableStateOf(false) }
+    var isRefreshing by remember { mutableStateOf(true) }
 
     var now by remember { mutableStateOf(LocalDateTime.now()) }
 
     val scope = rememberCoroutineScope()
 
     suspend fun refresh() {
+        isRefreshing = true
+
         now = LocalDateTime.now()
         val startOfToday = now.toLocalDate().atStartOfDay()
         val startOfYesterday = startOfToday.minusDays(1)
@@ -83,6 +88,8 @@ fun HealthDashboard(
             healthFunctions.getHourlySteps(today),
             healthFunctions.getHourlySteps(yesterday)
         )
+
+        isRefreshing = false
     }
 
     LaunchedEffect(Unit) {
@@ -95,9 +102,7 @@ fun HealthDashboard(
         isRefreshing = isRefreshing,
         onRefresh = {
             scope.launch {
-                isRefreshing = true
                 refresh()
-                isRefreshing = false
             }
         }
     ) {
@@ -114,6 +119,17 @@ fun HealthDashboard(
             )
         ) {
             Text("Last Updated: $now")
+
+            if (isRefreshing) {
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
             HorizontalDivider()
             HealthChart(
                 "Calories Burned",
@@ -141,9 +157,14 @@ fun HealthDashboard(
                         isRefreshing = false
                     }
                 },
+                enabled = !isRefreshing,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Refresh")
+                if (isRefreshing) {
+                    CircularProgressIndicator()
+                } else {
+                    Text("Refresh")
+                }
             }
         }
     }
