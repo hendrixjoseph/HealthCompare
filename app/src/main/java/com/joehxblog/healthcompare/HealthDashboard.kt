@@ -1,19 +1,24 @@
 package com.joehxblog.healthcompare
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -22,8 +27,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,24 +50,27 @@ fun HealthDashboard(
     @PreviewParameter(HealthFunctionsProvider::class)
     healthFunctions: HealthFunctions
 ) {
-    var todaySteps by remember { mutableLongStateOf(0L) }
-    var yesterdaySteps by remember { mutableLongStateOf(0L) }
-    var todayCalories by remember { mutableLongStateOf(0L) }
-    var yesterdayCalories by remember { mutableLongStateOf(0L) }
-    var weeklyAvgSteps by remember { mutableLongStateOf(0L) }
-    var weeklyAvgCalories by remember { mutableLongStateOf(0L) }
+    var todaySteps by rememberSaveable { mutableLongStateOf(0L) }
+    var yesterdaySteps by rememberSaveable { mutableLongStateOf(0L) }
+    var todayCalories by rememberSaveable { mutableLongStateOf(0L) }
+    var yesterdayCalories by rememberSaveable { mutableLongStateOf(0L) }
+    var weeklyAvgSteps by rememberSaveable { mutableLongStateOf(0L) }
+    var weeklyAvgCalories by rememberSaveable { mutableLongStateOf(0L) }
 
-    var calorieChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
-    var stepChartData by remember { mutableStateOf(ChartData(emptyList(), emptyList())) }
+    var calorieChartData by rememberSaveable {
+        mutableStateOf(ChartData(emptyList(), emptyList()))
+    }
+    var stepChartData by rememberSaveable {
+        mutableStateOf(ChartData(emptyList(), emptyList()))
+    }
 
-    var isRefreshing by remember { mutableStateOf(true) }
+    var isRefreshing by rememberSaveable { mutableStateOf(true) }
 
-    var now by remember { mutableStateOf(LocalDateTime.now()) }
+    var now by rememberSaveable { mutableStateOf(LocalDateTime.now()) }
 
     val formatter = DateTimeFormatter
         .ofLocalizedDateTime(FormatStyle.MEDIUM)
         .withLocale(Locale.getDefault())
-
 
     val scope = rememberCoroutineScope()
 
@@ -101,7 +109,10 @@ fun HealthDashboard(
     }
 
     LaunchedEffect(Unit) {
-        refresh()
+        if (calorieChartData.isEmpty()) {
+            Log.i("refresh", "from LaunchedEffect")
+            refresh()
+        }
     }
 
     val scrollState = rememberScrollState()
@@ -110,6 +121,7 @@ fun HealthDashboard(
         isRefreshing = isRefreshing,
         onRefresh = {
             scope.launch {
+                Log.i("refresh", "from PullToRefreshBox")
                 refresh()
             }
         }
@@ -128,15 +140,6 @@ fun HealthDashboard(
         ) {
             Text("Last Updated: ${now.format(formatter)}")
 
-            if (isRefreshing) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-
             HorizontalDivider()
             HealthChart(
                 "Calories Burned",
@@ -144,7 +147,8 @@ fun HealthDashboard(
                 todayCalories,
                 yesterdayCalories,
                 weeklyAvgCalories,
-                calorieChartData
+                calorieChartData,
+                isRefreshing
             )
             HorizontalDivider()
             HealthChart(
@@ -153,15 +157,15 @@ fun HealthDashboard(
                 todaySteps,
                 yesterdaySteps,
                 weeklyAvgSteps,
-                stepChartData
+                stepChartData,
+                isRefreshing
             )
             HorizontalDivider()
             Button(
                 onClick = {
                     scope.launch {
-                        isRefreshing = true
+                        Log.i("refresh", "from Button")
                         refresh()
-                        isRefreshing = false
                     }
                 },
                 enabled = !isRefreshing,
@@ -184,11 +188,22 @@ fun HealthChart(
     today: Number,
     yesterday: Number,
     weekly: Number,
-    chartData: ChartData
+    chartData: ChartData,
+    isRefreshing: Boolean
 ) {
     val nf = NumberFormat.getNumberInstance()
 
-    Text(title, style = MaterialTheme.typography.headlineSmall)
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(title, style = MaterialTheme.typography.headlineSmall)
+        if (isRefreshing) {
+            Spacer(
+                Modifier.width(5.dp)
+            )
+            LinearProgressIndicator()
+        }
+    }
     Row {
         Text("Today", Modifier.weight(1.0F))
         Text("Yesterday", Modifier.weight(1.0F))

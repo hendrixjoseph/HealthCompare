@@ -33,8 +33,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 fun LineChart(
     @PreviewParameter(ChartDataProvider::class)
     data: ChartData,
-    yAxisLabel: String = "kCal",
-    modifier: Modifier = Modifier
+    yAxisLabel: String = "kCal"
 ) {
     when {
         data.isEmpty() -> {
@@ -95,7 +94,7 @@ fun LineChart(
                     initialZoom = remember { Zoom.fixed(0.25f) }
                 ),
                 modelProducer =  modelProducer,
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .height(300.dp)
             )
