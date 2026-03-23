@@ -9,17 +9,17 @@ import kotlin.random.Random
 
 
 class HealthFunctionsProvider : PreviewParameterProvider<HealthFunctions> {
-    override val values = listOf(MockHealthFunctions()).asSequence()
+    override val values = sequenceOf(MockHealthFunctions())
 }
 
 class ChartDataProvider : PreviewParameterProvider<ChartData> {
-    override val values = listOf(
+    override val values = sequenceOf(
         ChartData(
             MockHealthFunctions().getHourlyCaloriesToday(),
             MockHealthFunctions().getHourlyCaloriesYesterday(),
 
             )
-    ).asSequence()
+    )
 }
 
 class MockHealthFunctions: HealthFunctions {

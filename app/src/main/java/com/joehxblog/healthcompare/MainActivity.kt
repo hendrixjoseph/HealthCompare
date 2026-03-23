@@ -1,8 +1,10 @@
 package com.joehxblog.healthcompare
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.health.connect.client.HealthConnectClient
@@ -11,6 +13,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.lifecycleScope
+import com.joehxblog.healthcompare.permission.HealthPermissionActivity
 import kotlinx.coroutines.launch
 
 
@@ -19,13 +22,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val healthClient = HealthConnectClient.getOrCreate(this)
-
-        val permissions = setOf(
-            HealthPermission.getReadPermission(StepsRecord::class),
-            HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class)
-        )
-
-        val requestPermissionActivityContract = PermissionController.createRequestPermissionResultContract()
 
         fun launch() {
             setContent {
@@ -38,12 +34,18 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        val requestPermissions = registerForActivityResult(requestPermissionActivityContract) { granted ->
-            if (granted.containsAll(permissions)) {
-                launch()
-            } else {
-                // Lack of required permissions
-            }
+        val permissions = setOf(
+            HealthPermission.getReadPermission(StepsRecord::class),
+            HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class)
+        )
+
+        val rationaleLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    launch()
+                } else {
+                    finish()
+                }
         }
 
         suspend fun checkPermissionsAndRun(healthConnectClient: HealthConnectClient) {
@@ -51,7 +53,8 @@ class MainActivity : ComponentActivity() {
             if (granted.containsAll(permissions)) {
                 launch()
             } else {
-                requestPermissions.launch(permissions)
+                val intent = Intent(this, HealthPermissionActivity::class.java)
+                rationaleLauncher.launch(intent)
             }
         }
 
