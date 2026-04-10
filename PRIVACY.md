@@ -19,7 +19,8 @@ The app does not write or modify any data in Health Connect.
 
 HealthCompare does not store or retain any user health data outside of what is temporarily needed
 for in-app display. All data is accessed in real time from Health Connect and is not persisted
-by the app.
+by the app. Data may be temporarily held in memory or short-lived app state for display purposes
+and is not retained long-term or outside the app.
 
 ## Data Deletion
 
