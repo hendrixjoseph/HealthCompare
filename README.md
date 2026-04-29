@@ -11,4 +11,5 @@ I created it because I was curious if I'd walked more today than I did yesterday
 
 # Availability
 
-<https://play.google.com/store/apps/details?id=com.joehxblog.healthcompare>
+* <https://play.google.com/store/apps/details?id=com.joehxblog.healthcompare>
+* <https://github.com/hendrixjoseph/HealthCompare/releases>
